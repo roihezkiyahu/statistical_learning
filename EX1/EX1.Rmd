@@ -26,7 +26,7 @@ $$
 ### 1a
 
 $$
-\frac{\partial E_{Y|X}[(L_\tau(Y,f(X)))|X=x]}{\partial f(x)} = \int_{min_y}^{f(x)}  (1-\tau) dF_Y(y) + \int_{f(x)}^{max_y}  -\tau dF_Y(y)=F_Y(f(x)) -\int_{min_y}^{f(x)}  \tau dF_Y(y) + \int_{f(x)}^{max_y}  -\tau dF_Y(y)=
+\frac{\partial E_{Y|X}[(L_\tau(Y,f(X)))|X=x]}{\partial f(x)} = \frac{\partial}{\partial f(x)}[\int_{min_y}^{f(x)}  (1-\tau) f_Y(y)dy + \int_{f(x)}^{max_y}  -\tau f_Y(y)dy]= F_Y(f(x)) - \tau F_Y(f(x)) - \tau + \tau F_Y(f(x)) =
 \\
 = F_Y(f(x)) - \tau = 0 \iff f(x) = F_y^{-1}(\tau)
 \\
