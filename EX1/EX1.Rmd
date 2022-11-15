@@ -26,7 +26,7 @@ $$
 ### 1a
 
 $$
-\frac{\partial E_{Y|X}[(L_\tau(Y,f(X)))|X=x]}{\partial f(x)} = \frac{\partial}{\partial f(x)}[\int_{min_y}^{f(x)}  (1-\tau) f_Y(y)dy + \int_{f(x)}^{max_y}  -\tau f_Y(y)dy]= F_Y(f(x)) - \tau F_Y(f(x)) - \tau + \tau F_Y(f(x)) =
+\frac{\partial E_{Y|X}[(L_\tau(Y,f(X)))|X=x]}{\partial f(x)} = \frac{\partial}{\partial f(x)}[\int_{min_y}^{f(x)}  (1-\tau) F_Y(y)dy + \int_{f(x)}^{max_y}  -\tau F_Y(y)dy]= F_Y(f(x)) - \tau F_Y(f(x)) - \tau + \tau F_Y(f(x)) =
 \\
 = F_Y(f(x)) - \tau = 0 \iff f(x) = F_y^{-1}(\tau)
 \\
@@ -48,29 +48,28 @@ P(D_c > r) = \Pi_{i=1}^nP(||X_i|| > r) = P(||X_1||>r)^n = (1 - P(||X_1||<r))^n= 
 $$
 
 ```{r}
-radius_function <- function(p){
-  n <- 1:100000
+radius_function <- function(n){
+  p <- 1:100
   return( (1 - 1/2^(1/n))^(1/p))
 }
-p_s <- c(3,5,10,20,50,100)
-df <- map(p_s,radius_function)
+n_s <- c(100,5000,100000,100000000)
+df <- map(n_s,radius_function)
 df <- as.data.frame(df)
-colnames(df) <- paste0("p_",p_s)
-df["n"] = 1:100000
-colors = c("p_3"="blue", "p_5" ="red","p_10"="purple","p_20"="yellow", "p_50"="black","p_100"="green")
+colnames(df) <- c("n_100","n_5000","n_100000","n_100000000")
+df["p"] = 1:100
+colors = c("n_100"="blue", "n_5000" ="red","n100000"="purple","n100mil"= "black")
 ggplot(data = df) + 
-  geom_smooth(aes(x = n, y = p_3,color = "p_3")) +
-  geom_smooth(aes(x = n, y = p_5,color = "p_5")) +
-  geom_smooth(aes(x = n, y = p_10,color = "p_10")) +
-  geom_smooth(aes(x = n, y = p_20,color = "p_20")) +
-  geom_smooth(aes(x = n, y = p_50,color = "p_50")) +
-  geom_smooth(aes(x = n, y = p_100,color = "p_100")) + 
-  labs(x="n", y = "fraction outside ball", color = "legend") + 
+  geom_smooth(aes(x = p, y = n_100,color = "n_100")) +
+  geom_smooth(aes(x = p, y = n_5000,color = "n_5000")) +
+  geom_smooth(aes(x = p, y = n_100000,color = "n100000")) +
+  geom_smooth(aes(x = p, y = n_100000000,color = "n100mil")) +
+  labs(x="p", y = "fraction outside ball", color = "legend") + 
   scale_color_manual(values = colors)
 ```
 
+
 $$
-\textrm{we can see that an p grows the fraction of observations outsde the ball increaces}
+\textrm{we can see that an p grows the fraction of observations outsde the ball increaces and even for a very high number of observations}
 $$
 
 # Q3
@@ -101,7 +100,7 @@ get_knn_res <- function(k,df_train,df_test){
 zip_lm <- lm(y~.,data = df_train)
 lr_train_err <- acc_err(df_train$y,(predict(zip_lm,df_train) > 0.5)*1)
 lr_test_err <- acc_err(df_test$y,(predict(zip_lm,df_test) > 0.5)*1)
-k_s = c(1,3,5,7,15)
+k_s = 1:15
 knn_train_res <- c()
 knn_test_res <- c()
 for (i in 1:length(k_s)){
@@ -110,11 +109,13 @@ for (i in 1:length(k_s)){
   knn_test_res <- c(knn_test_res,knn_res[2])
 }
 result_df <- tibble(k = c(0,k_s),train_res = c(lr_train_err,knn_train_res) ,test_res = c(lr_test_err,knn_test_res))
-colors = c("train"="blue", "test" ="red")
+colors = c("train"="blue", "test" ="red","train_lr" = "orange", "test_lr" = "black")
 ggplot(data = result_df) + 
-  geom_smooth(aes(x = k, y = train_res,color = "train")) +
-  geom_smooth(aes(x = k, y = test_res,color = "test")) +
-  labs(x="k", y = "error", color = "legend", caption = "k = 0 is linear regression") + 
+  geom_smooth(aes(x = k, y = train_res,color = "train"),se=FALSE) +
+  geom_smooth(aes(x = k, y = test_res,color = "test"),se=FALSE) +
+  geom_hline(aes(yintercept  = lr_train_err, color = "train_lr")) +
+  geom_hline(aes(yintercept  = lr_test_err, color = "test_lr")) +
+  labs(x="k", y = "error", color = "legend") + 
   scale_color_manual(values = colors)
 ```
 
