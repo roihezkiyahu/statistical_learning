@@ -1,4 +1,4 @@
-# Linear-models
+# statistical learning
 
 this repo contatins my solution to home assigmnet from the course statistical learning an advanced course for statistics masters students 
 based on the book elements of statistical learning
